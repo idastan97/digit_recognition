@@ -1,2 +1,1 @@
-dtype=int
-print(dtype(1))
+print(-1%8)

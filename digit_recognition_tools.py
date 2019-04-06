@@ -29,7 +29,7 @@ from coord_operations import *
 #     return res-1
 
 
-def number_of_holes(img):
+def get_holes(img):
     ''' new implementation with BFS. Fast '''
     adjs = [
         (-1, 0),
@@ -37,15 +37,17 @@ def number_of_holes(img):
         (1, 0),
         (0, -1)
     ]
-    res = 0
+    holes = []
     im = np.copy(img)
     h, w = im.shape
     for i in range(h):
         for j in range(w):
             if im[i][j] == 0:
+                hol = np.zeros((h, w), dtype=int)
                 q = Queue()
                 q.put((i, j))
                 im[i][j] = 1
+                hol[i][j]
                 while not q.empty():
                     x, y = q.get()
                     for adj in adjs:
@@ -54,8 +56,9 @@ def number_of_holes(img):
                             im[ax][ay] == 0):
                             q.put((ax, ay))
                             im[ax][ay] = 1
-                res += 1
-    return res - 1
+                            hol[ax][ay] = 1
+                holes.append(hol)
+    return holes
 
 
 def major_axis(img):
@@ -77,7 +80,7 @@ def major_axis(img):
 
 def minor_axis(img, major_points):
     a, b = major_points
-    res = None
+    res = (a, a)
     max_d = -1
     h, w = img.shape
     for i in range(h):
@@ -91,3 +94,20 @@ def minor_axis(img, major_points):
                                 max_d = d
                                 res = ((i, j), (x, y))
     return res
+
+
+def defect_filling(img):
+    im = np.copy(img)
+    h, w = im.shape
+    for i in range(1, h-1):
+        for j in range(1, w-1):
+            if im[i][j] == 0:
+                a = [(i-1, j-1), (i-1, j), (i-1, j+1), (i, j+1), (i+1, j+1), (i+1, j), (i+1, j-1), (i, j-1)]
+                for k in range(8):
+                    if (im[a[k][0]][a[k][1]] and 
+                        im[a[(k-2)%8][0]][a[(k-2)%8][1]]==0 and im[a[(k-1)%8][0]][a[(k-1)%8][1]]==0 and
+                        im[a[(k+1)%8][0]][a[(k+1)%8][1]]==0 and im[a[(k+2)%8][0]][a[(k+2)%8][1]]==0 and
+                        (im[a[(k+3)%8][0]][a[(k+3)%8][1]] or im[a[(k+4)%8][0]][a[(k+4)%8][1]] or im[a[(k+5)%8][0]][a[(k+5)%8][1]])):
+                        im[i][j] = 1
+                        break
+    return im

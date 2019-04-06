@@ -255,9 +255,13 @@ def histogram(img):
     return res
 
 
+# def thresh_val(img):
+#     h, w = img.shape
+#     hist = histogram(img)
+#     for i in range(len(hist)-1, -1,  -1):
+#         if hist[i] > 20:
+#             return (i+1)*4
+
+
 def thresh_val(img):
-    h, w = img.shape
-    hist = histogram(img)
-    for i in range(len(hist)-1, -1,  -1):
-        if hist[i] > 50:
-            return (i+1)*4
+    return (np.max(img) + np.min(img))*2/5
