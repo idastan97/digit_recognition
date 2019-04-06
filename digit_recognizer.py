@@ -1,43 +1,43 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from image_processing_tools import *
+from queue import Queue
 
-def number_of_holes(img):
-    res = 0
-    im = np.copy(img)
-    h, w = im.shape
-    while 1:
-        rx, ry = -1, -1
-        for i in range(h):
-            for j in range(w):
-                if im[i][j] == 0:
-                    rx, ry = i, j
-                    break
-            if rx >= 0:
-                break
-        if rx < 0:
-            break
-        im = region_filling(im, rx, ry)
-        res += 1
-    return res-1
+from image_processing_tools import *
+from digit_recognition_tools import *
+from coord_operations import *
 
 
 def recognize(img):
-    dim = 75
     im = np.copy(img)
     h, w, d = im.shape
+
+    # resizeing
+    dim = 75
     zoom_coef = min(dim/h, dim/w)
-    im = bilinear_interpolation(to_gray(im), zoom_coef)
-
-
+    im = zoom_bilinear_interpolation(to_gray(im), zoom_coef)
     plt.imshow(im, cmap='gray')
     plt.show()
+
+    # thresholding (to binary)
     im = thresholding(negative(im))
     plt.imshow(im, cmap='gray')
     plt.show()
+
+    # closing, to remove irrelevant holes
     im = closing(im)
     plt.imshow(im, cmap='gray')
     plt.show()
     plt.imsave('ss.png', 255*im, cmap='gray')
-    print(number_of_holes(im))
+
+    # count the number of holes
+    num_holes = number_of_holes(im)
+    print('----')
+    print(num_holes)
+
+
+    p1, p2 = major_axis(im)
+    print(p1, p2)
+
+    q1, q2 = minor_axis(im, (p1, p2))
+    print(q1, q2)

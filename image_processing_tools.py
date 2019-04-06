@@ -181,7 +181,7 @@ def laplacian(img, threshold=128):
                 res[i][j] = 0
     return res
 
-def bilinear_interpolation(img, zoom_coef):
+def zoom_bilinear_interpolation(img, zoom_coef):
     h, w = img.shape
     zH = round(h*zoom_coef)
     zW = round(w*zoom_coef)
