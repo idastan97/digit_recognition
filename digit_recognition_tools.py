@@ -68,7 +68,7 @@ def major_axis(img):
                 for x in range(h):
                     for y in range(w):
                         if img[x][y] == 1:
-                            d = distance_sq((i, j), (x, y))
+                            d = dist_sq((i, j), (x, y))
                             if d > max_d:
                                 max_d = d
                                 res = ((i, j), (x, y))
@@ -86,7 +86,7 @@ def minor_axis(img, major_points):
                 for x in range(h):
                     for y in range(w):
                         if img[x][y] == 1 and is_orthogonal(a, b, (i, j), (x, y)):
-                            d = distance_sq((i, j), (x, y))
+                            d = dist_sq((i, j), (x, y))
                             if d > max_d:
                                 max_d = d
                                 res = ((i, j), (x, y))

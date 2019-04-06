@@ -19,8 +19,12 @@ def recognize(img):
     plt.imshow(im, cmap='gray')
     plt.show()
 
+    # negative
+    im = negative(im)
+
     # thresholding (to binary)
-    im = thresholding(negative(im))
+    threshold = thresh_val(im)
+    im = thresholding(im, threshold)
     plt.imshow(im, cmap='gray')
     plt.show()
 
@@ -32,12 +36,14 @@ def recognize(img):
 
     # count the number of holes
     num_holes = number_of_holes(im)
-    print('----')
-    print(num_holes)
+    print(' - number of holes:', num_holes)
+    if num_holes == 2:
+        return 8
 
-
+    # majos/minor axis
     p1, p2 = major_axis(im)
-    print(p1, p2)
-
+    print(' - major axis points:', p1, p2)
     q1, q2 = minor_axis(im, (p1, p2))
-    print(q1, q2)
+    print(' - minor axis points:', q1, q2)
+    if dist(q1, q2) < dim*0.2:
+        return 1

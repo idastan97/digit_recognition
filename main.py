@@ -22,6 +22,6 @@ from digit_recognizer import recognize
 
 # recognize(dgs[8][0])
 
-imm = cv2.imread("samples/62.jpg")
-recognize(imm)
+imm = cv2.imread("samples/84.jpg")
+print(recognize(imm))
     

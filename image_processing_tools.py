@@ -4,6 +4,7 @@ import math
 import matplotlib.pyplot as plt
 from math import floor, ceil, sqrt
 
+
 def to_gray(img):
     h, w, d = img.shape
     res = np.zeros((h, w), dtype=int)
@@ -11,6 +12,7 @@ def to_gray(img):
         for j in range(w):
             res[i][j] = round(np.sum(img[i][j])/3)
     return res
+
 
 def negative(img):
     h, w = img.shape
@@ -21,7 +23,7 @@ def negative(img):
     return res
 
 
-def thresholding(img, threshold=100):
+def thresholding(img, threshold=95):
     res = np.copy(img)
     h, w = img.shape
     for i in range(h):
@@ -133,7 +135,7 @@ def region_filling(A, x, y):
 
 def closing(img):
     s = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]])
-    return erosion(erosion(dilation(dilation(img, s), s)))
+    return erosion(erosion(dilation(dilation(img))))
 
 
 def linear_filter_at(img, mask, x, y):
@@ -180,6 +182,7 @@ def laplacian(img, threshold=128):
             if res[i][j] < threshold:
                 res[i][j] = 0
     return res
+
 
 def zoom_bilinear_interpolation(img, zoom_coef):
     h, w = img.shape
@@ -241,3 +244,20 @@ def zoom_bilinear_interpolation(img, zoom_coef):
                     sm = sm + (img[round(nears_i[a]+0.5)][round(nears_j[b]+0.5)]/d)
             zI[i][j] = round(sm/dists)
     return zI
+
+
+def histogram(img):
+    h, w = img.shape
+    res = [0 for i in range(0, 256, 4)]
+    for i in range(h):
+        for j in range(w):
+            res[img[i][j]//4] += 1
+    return res
+
+
+def thresh_val(img):
+    h, w = img.shape
+    hist = histogram(img)
+    for i in range(len(hist)-1, -1,  -1):
+        if hist[i] > 50:
+            return (i+1)*4
