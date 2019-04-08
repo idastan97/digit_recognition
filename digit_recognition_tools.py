@@ -93,6 +93,13 @@ def minor_axis(img, major_points):
                             if d > max_d:
                                 max_d = d
                                 res = ((i, j), (x, y))
+                x, y = projection_point_to_segment((i, j), a, b)
+                x = round(x)
+                y = round(y)
+                d = dist_sq((i, j), (x, y))
+                if d > max_d:
+                    max_d = d
+                    res = ((i, j), (x, y))
     return res
 
 
@@ -111,3 +118,73 @@ def defect_filling(img):
                         im[i][j] = 1
                         break
     return im
+
+
+def dists_from_left(img):
+    h, w = img.shape
+    res = []
+    for i in range(h):
+        for j in range(w):
+            if img[i][j] == 1:
+                res.append(j)
+                break
+    return res
+
+
+def dists_from_right(img):
+    h, w = img.shape
+    res = []
+    for i in range(h):
+        for j in range(-1, -w-1, -1):
+            if img[i][j] == 1:
+                res.append(-j-1)
+                break
+    return res
+
+
+def sum_horizontal(img):
+    return np.sum(img, axis=1)
+
+
+def diff(arr):
+    res = []
+    for i in range(len(arr)-1):
+        res.append(arr[i+1]-arr[i])
+    return res
+
+
+def draw_line(img, p1, p2):
+    im = np.copy(img)
+    h, w = im.shape
+    a, b = line_equation(p1[::-1], p2[::-1])
+    print(a, b)
+    for i in range(1, w-1):
+        j = ceil(a*i + b)
+        for k in range(3):
+            if j-k >= 0 and j-k < h:
+                im[j-k][i] = 1
+    return im 
+
+
+def lowest_point(img):
+    h, w = img.shape
+    for i in range(h-1, -1, -1):
+        for j in range(w):
+            if img[i][j]:
+                return i, j
+
+
+def highest_point(img):
+    h, w = img.shape
+    for i in range(h):
+        for j in range(w-1, -1, -1):
+            if img[i][j]:
+                return i, j
+
+
+def right_edges(img):
+    im = np.copy(img)
+    h, w = img.shape
+    lowest_p = lowest_point(im)
+    highest_p = highest_point(im)
+    

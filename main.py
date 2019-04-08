@@ -17,10 +17,10 @@ from digit_recognizer import recognize
 #     dgs.append(cols) 
 # recognize(dgs[8][0])
 
-# for i in range(4):
-#     imm = cv2.imread("samples/7" + str(i+1) +".jpg")
-#     print(recognize(imm))
+for i in range(4):
+    imm = cv2.imread("samples/7" + str(i+1) +".jpg")
+    print(recognize(imm))
 
-imm = cv2.imread("samples/73.jpg")
-print(recognize(imm))
+# imm = cv2.imread("samples/74.jpg")
+# print(recognize(imm))
 

@@ -265,3 +265,13 @@ def histogram(img):
 
 def thresh_val(img):
     return (np.max(img) + np.min(img))*2/5
+
+
+def points_to_list(img):
+    h, w = img.shape
+    res = []
+    for i in range(h):
+        for j in range(w):
+            if img[i][j]:
+                res.append((i, j))
+    return res
