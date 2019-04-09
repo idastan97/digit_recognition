@@ -10,7 +10,9 @@ def to_gray(img):
     res = np.zeros((h, w), dtype=int)
     for i in range(h):
         for j in range(w):
-            res[i][j] = round(np.sum(img[i][j])/3)
+            r, g, b = img[i][j]
+            # res[i][j] = round(np.sum(img[i][j])/3)
+            res[i][j] = round(sqrt((r**2+g**2+b**2)/3))
     return res
 
 

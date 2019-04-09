@@ -183,8 +183,98 @@ def highest_point(img):
 
 
 def right_edges(img):
-    im = np.copy(img)
     h, w = img.shape
-    lowest_p = lowest_point(im)
-    highest_p = highest_point(im)
+    im = np.ones((h, w), dtype=int)
+    for i in range(h):
+        for j in range(w-1, -1, -1):
+            if img[i][j]:
+                im[i][j] = 1
+                break
+            im[i][j] = 0
+    return im
+
+
+def left_edges(img):
+    h, w = img.shape
+    im = np.ones((h, w), dtype=int)
+    for i in range(h):
+        for j in range(w):
+            if img[i][j]:
+                im[i][j] = 1
+                break
+            im[i][j] = 0
+    return im
+
+
+def right_maxs(img):
+    im = right_edges(img)
+    h, w = img.shape
+
+    # lowest_p = lowest_point(im)
+    # highest_p = highest_point(im)
+    ru = erosion(im, np.array([[np.nan, 0, 0], [np.nan, 1, 0], [np.nan, np.nan, 0]]))
+    rl = erosion(im, np.array([[np.nan, np.nan, 0], [np.nan, 1, 0], [np.nan, 0, 0]]))
+    res = []
     
+    av = [1]*h
+
+    for j in range(w-1, -1, -1):
+        previ = h
+        for i in range(h-1, -1, -1):
+            if ru[i][j]:
+                for x in range(i, previ):
+                    if not im[x][j] or not av[x]:
+                        break
+                    if rl[x][j]:
+                        rl[x][j]=0
+                        res.append((i, x, j))
+                        av[i: x+1] = [0]*(x-i+1)
+                        break
+                previ = i
+    return res
+
+
+def left_maxs(img):
+    im = left_edges(img)
+    h, w = img.shape
+
+    # lowest_p = lowest_point(im)
+    # highest_p = highest_point(im)
+
+    ll = erosion(im, np.array([[0, np.nan, np.nan], [0, 1, np.nan], [0, 0, np.nan]]))
+    lu = erosion(im, np.array([[0, 0, np.nan], [0, 1, np.nan], [0, np.nan, np.nan]]))
+    res = []
+
+    av = [1]*h
+    
+    for j in range(w):
+        previ = h
+        for i in range(h-1, -1, -1):
+            if lu[i][j]:
+                for x in range(i, previ):
+                    if not im[x][j] or not av[x]:
+                        break
+                    if ll[x][j]:
+                        ll[x][j]=0
+                        res.append((i, x, j))
+                        av[i: x+1] = [0]*(x-i+1)
+                        break
+                previ = i
+    return res
+
+
+def horizontal_lines(img, thickness):
+    rps = list(map(lambda p: ((p[0]+p[1])//2, p[2]), filter(lambda p: p[1] - p[0] <= thickness, right_maxs(img))))
+    lps = list(map(lambda p: ((p[0]+p[1])//2, p[2]), filter(lambda p: p[1] - p[0] <= thickness, left_maxs(img))))
+    res = []
+    for rp in rps:
+        l = None
+        min_slope = inf
+        for lp in lps:
+            s = abs(slope(rp[::-1], lp[::-1]))
+            if s <= 0.5 and s < inf and dist(rp, lp) > thickness:
+                l = lp
+                min_slope = s
+        if not (l is None):
+            res.append((l, rp))
+    return res

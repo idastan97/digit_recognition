@@ -105,50 +105,57 @@ def recognize(img):
         if fnum_holes == 1:
             return 4
 
-    rl = points_to_list(erosion(im, np.array([[np.nan, np.nan, 0], [np.nan, 1, 0], [np.nan, 0, 0]])))[::-1]
-    # plt.imshow(rl, cmap='gray')
-    # plt.show()
-    ru = points_to_list(erosion(im, np.array([[np.nan, 0, 0], [np.nan, 1, 0], [np.nan, np.nan, 0]])))[::-1]
-    # plt.imshow(ru, cmap='gray')
-    # plt.show()
-    rps = []
-    print(lowest_p[0])
-    print(highest_p[0])
-    print(lowest_p[0]-(lowest_p[0]-highest_p[0])/3)
-    for el in rl:
-        if lowest_p[0]-(lowest_p[0]-highest_p[0])/3 > el[0]:
-            for eu in ru:
-                if dist(el, eu) < thickness:
-                    x, y = mid(el, eu)
-                    rp = (round(x), round(y))
-                    break
-            if not (rp is None):
-                break
 
-    ll = points_to_list(erosion(im, np.array([[0, np.nan, np.nan], [0, 1, np.nan], [0, 0, np.nan]])))[::-1]
-
-    # plt.imshow(ll, cmap='gray')
-    # plt.show()
-    lu = points_to_list(erosion(im, np.array([[0, 0, np.nan], [0, 1, np.nan], [0, np.nan, np.nan]])))[::-1]
-
-    # plt.imshow(lu, cmap='gray')
-    # plt.show()
-
-    lp = None
-    for el in ll:
-        if lowest_p[0]-(lowest_p[0]-highest_p[0])/3 > el[0]:
-            for eu in lu:
-                if dist(el, eu) < thickness:
-                    x, y = mid(el, eu)
-                    lp = (round(x), round(y))
-                    break
-            if not (lp is None):
-                break
-
-    print(rp, lp)
-
+    hls = horizontal_lines(im, thickness)
+    print(hls)
     plt.imshow(im, cmap='gray')
     plt.show()
+
+
+    # rl = points_to_list(erosion(im, np.array([[np.nan, np.nan, 0], [np.nan, 1, 0], [np.nan, 0, 0]])))[::-1]
+    # # plt.imshow(rl, cmap='gray')
+    # # plt.show()
+    # ru = points_to_list(erosion(im, np.array([[np.nan, 0, 0], [np.nan, 1, 0], [np.nan, np.nan, 0]])))[::-1]
+    # # plt.imshow(ru, cmap='gray')
+    # # plt.show()
+    # rp = None
+    # print(lowest_p[0])
+    # print(highest_p[0])
+    # print(lowest_p[0]-(lowest_p[0]-highest_p[0])/3)
+    # for el in rl:
+    #     if lowest_p[0]-(lowest_p[0]-highest_p[0])/3 > el[0]:
+    #         for eu in ru:
+    #             if dist(el, eu) < thickness:
+    #                 x, y = mid(el, eu)
+    #                 rp = (round(x), round(y))
+    #                 break
+    #         if not (rp is None):
+    #             break
+
+    # ll = points_to_list(erosion(im, np.array([[0, np.nan, np.nan], [0, 1, np.nan], [0, 0, np.nan]])))[::-1]
+
+    # # plt.imshow(ll, cmap='gray')
+    # # plt.show()
+    # lu = points_to_list(erosion(im, np.array([[0, 0, np.nan], [0, 1, np.nan], [0, np.nan, np.nan]])))[::-1]
+
+    # # plt.imshow(lu, cmap='gray')
+    # # plt.show()
+
+    # lp = None
+    # for el in ll:
+    #     if lowest_p[0]-(lowest_p[0]-highest_p[0])/3 > el[0]:
+    #         for eu in lu:
+    #             if dist(el, eu) < thickness:
+    #                 x, y = mid(el, eu)
+    #                 lp = (round(x), round(y))
+    #                 break
+    #         if not (lp is None):
+    #             break
+
+    # print(rp, lp)
+
+    # plt.imshow(im, cmap='gray')
+    # plt.show()
 
     # ld = dists_from_left(im)
     # y_pos = np.arange(len(ld))
