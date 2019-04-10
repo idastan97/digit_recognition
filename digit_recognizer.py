@@ -11,18 +11,13 @@ from coord_operations import *
 
 
 def recognize(img):
-    thickness = 5
-
     im = np.copy(img)
     h, w, d = im.shape
 
-    # resizeing
-    dim = 75
-    zoom_coef = min(dim/h, dim/w)
-    im = zoom_bilinear_interpolation(to_gray(im), zoom_coef)
+    
+    
+    im = to_gray(im)
     h, w = im.shape
-    # # plt.imshow(im, cmap='gray')
-    # # plt.show()
 
     # negative
     im = negative(im)
@@ -30,8 +25,90 @@ def recognize(img):
     # thresholding (to binary)
     threshold = thresh_val(im)
     im = thresholding(im, threshold)
-    # # plt.imshow(im, cmap='gray')
-    # # plt.show()
+    plt.imshow(im, cmap='gray')
+    plt.show()
+    plt.imsave('ss.png', im, cmap='gray')
+
+    adjs = [
+        (-1, 0),
+        (-1, 1),
+        (0, 1),
+        (1, 1),
+        (1, 0),
+        (1, -1),
+        (0, -1),
+        (-1, -1)
+    ]
+    nums = []
+    im2 = np.copy(im)
+    # h, w = im.shape
+    max_pxs = 0
+    pxss = []
+    cords = []
+    for j in range(w):
+        for i in range(h):
+            if im[i][j] == 1:
+                num = np.zeros((h, w), dtype=int)
+                q = Queue()
+                q.put((i, j))
+                im[i][j] = 0
+                num[i][j] = 1
+                pxs = 1
+                minx = i
+                miny = j
+                maxx = i
+                maxy = j
+                while not q.empty():
+                    x, y = q.get()
+                    for adj in adjs:
+                        ax, ay = x+adj[0], y+adj[1]
+                        if (ax >= 0 and ax < h and ay >= 0 and ay < w and
+                            im[ax][ay] == 1):
+                            q.put((ax, ay))
+                            im[ax][ay] = 0
+                            num[ax][ay] = 1
+                            pxs += 1
+                            if ax < minx:
+                                minx = ax
+                            if ax > maxx:
+                                maxx= ax
+                            if ay < miny:
+                                miny = ay
+                            if ay > maxy:
+                                maxy= ay
+                if pxs > max_pxs:
+                    max_pxs = pxs
+                pxss.append(pxs)
+                cords.append(  ( (minx, miny), (maxx, maxy) )  )
+                nums.append(num)
+    nums2 = []
+    for i in range(len(pxss)):
+        if pxss[i] < max_pxs/4:
+            continue
+        p1, p2 = cords[i]
+        # print(p1, p2)
+        nums2.append(add_frame(get_subarray(im2, p1, p2)))
+        # plt.imshow(nums2[-1], cmap='gray')
+        # plt.show()
+
+    res = []
+    for i in range(len(nums2)):
+        print(i)
+        res.append(digit_recognize(nums2[i]))
+
+    return res
+
+
+def digit_recognize(img):
+    thickness = 5
+
+    h, w = img.shape
+    # resizeing
+    dim = 75
+    zoom_coef = min(dim/h, dim/w)
+    im = zoom_bilinear_interpolation(img, zoom_coef)
+
+    h, w = im.shape
 
     # closing, to remove irrelevant holes
     im = closing(im)
@@ -39,9 +116,9 @@ def recognize(img):
     # # plt.show()
 
     im = defect_filling(im)
-    # plt.imshow(im, cmap='gray')
-    # plt.show()
-    # plt.imsave('ss.png', 255*im, cmap='gray')
+    plt.imshow(im, cmap='gray')
+    plt.show()
+    # plt.imsave('ss.png', im, cmap='gray')
 
     # count the number of holes
     holes = get_holes(im)

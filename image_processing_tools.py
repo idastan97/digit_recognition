@@ -11,8 +11,8 @@ def to_gray(img):
     for i in range(h):
         for j in range(w):
             r, g, b = img[i][j]
-            # res[i][j] = round(np.sum(img[i][j])/3)
-            res[i][j] = round(sqrt((r**2+g**2+b**2)/3))
+            res[i][j] = round(np.sum(img[i][j])/3)
+            # res[i][j] = round(sqrt((r**2+g**2+b**2)/3))
     return res
 
 
@@ -244,7 +244,7 @@ def zoom_bilinear_interpolation(img, zoom_coef):
                     d = sqrt((nears_i[a]+map_i)**2 + (nears_j[b]+map_j)**2)
                     dists = dists + 1/d
                     sm = sm + (img[round(nears_i[a]+0.5)][round(nears_j[b]+0.5)]/d)
-            zI[i][j] = round(sm/dists)
+            zI[i][j] = 1 if round(sm/dists) >= 1 else 0
     return zI
 
 
@@ -266,7 +266,7 @@ def histogram(img):
 
 
 def thresh_val(img):
-    return (np.max(img) + np.min(img))*2/5
+    return (np.max(img) + np.min(img))*2.0/5.0
 
 
 def points_to_list(img):
@@ -277,3 +277,21 @@ def points_to_list(img):
             if img[i][j]:
                 res.append((i, j))
     return res
+
+
+def get_subarray(img, p1, p2):
+    res = np.zeros(( p2[0]-p1[0]+1,  p2[1]-p1[1]+1), dtype=int)
+    for i in range(p2[0]-p1[0]+1):
+        for j in range(p2[1]-p1[1]+1):
+            res[i][j] = img[i+p1[0]][j+p1[1]]
+    return res
+
+
+def add_frame(img, thick=3):
+    h, w = img.shape
+    im = img
+    l = thick
+    t = thick
+    im = np.concatenate( (np.zeros([h, l], dtype=int), im, np.zeros([h, l], dtype=int)), axis=1)
+    im = np.concatenate( (np.zeros([t, w+2*l], dtype=int), im, np.zeros([t, w+2*l], dtype=int)), axis=0)
+    return im
