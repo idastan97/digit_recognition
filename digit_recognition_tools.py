@@ -143,7 +143,7 @@ def dists_from_right(img):
 
 
 def sum_horizontal(img):
-    return np.sum(img, axis=1)
+    return list(filter(lambda x: x>0, np.sum(img, axis=1).tolist()))
 
 
 def diff(arr):
@@ -153,17 +153,31 @@ def diff(arr):
     return res
 
 
-def draw_line(img, p1, p2):
+def draw_line_h(img, p1, p2, t=3):
     im = np.copy(img)
     h, w = im.shape
     a, b = line_equation(p1[::-1], p2[::-1])
-    print(a, b)
+    # # print(a, b)
     for i in range(1, w-1):
         j = ceil(a*i + b)
-        for k in range(3):
-            if j-k >= 0 and j-k < h:
+        for k in range(t):
+            if j-k > 0 and j-k < h-1:
                 im[j-k][i] = 1
+    return im
+
+
+def draw_line_v(img, p1, p2, t=3):
+    im = np.copy(img)
+    h, w = im.shape
+    a, b = line_equation(p1, p2)
+    # # print(a, b)
+    for i in range(1, h-1):
+        j = ceil(a*i + b)
+        for k in range(t):
+            if j+k > 0 and j+k < w-1:
+                im[i][j+k] = 1
     return im 
+
 
 
 def lowest_point(img):
@@ -235,6 +249,7 @@ def right_maxs(img):
 
 
 def left_maxs(img):
+    # # print('*************')
     im = left_edges(img)
     h, w = img.shape
 
@@ -251,6 +266,7 @@ def left_maxs(img):
         previ = h
         for i in range(h-1, -1, -1):
             if lu[i][j]:
+                # # print(i, j)
                 for x in range(i, previ):
                     if not im[x][j] or not av[x]:
                         break
@@ -263,6 +279,30 @@ def left_maxs(img):
     return res
 
 
+def check_horizontal_line(img, p1, p2):
+    a, b = line_equation(p1[::-1], p2[::-1])
+    for j in range(p1[1]+1, p2[1]):
+        i = round(a*j + b)
+        adjs = [img[i-2][j], img[i-1][j], img[i][j], img[i+1][j], img[i+2][j]]
+        if not any(adjs):
+            # # print('---------')
+            # # print(i, j)
+            return False
+    return True
+
+
+def check_vertical_line(img, p1, p2):
+    a, b = line_equation(p1, p2)
+    for i in range(p1[0]+1, p2[0]):
+        j = round(a*i + b)
+        adjs = [img[i][j-2], img[i][j-1], img[i][j], img[i][j+1], img[i][j+2]]
+        if not any(adjs):
+            # # print('---------')
+            # # print(i, j)
+            return False
+    return True
+
+
 def horizontal_lines(img, thickness):
     rps = list(map(lambda p: ((p[0]+p[1])//2, p[2]), filter(lambda p: p[1] - p[0] <= thickness, right_maxs(img))))
     lps = list(map(lambda p: ((p[0]+p[1])//2, p[2]), filter(lambda p: p[1] - p[0] <= thickness, left_maxs(img))))
@@ -272,9 +312,23 @@ def horizontal_lines(img, thickness):
         min_slope = inf
         for lp in lps:
             s = abs(slope(rp[::-1], lp[::-1]))
-            if s <= 0.5 and s < inf and dist(rp, lp) > thickness:
+            if s <= 0.5 and s < inf and dist(rp, lp) > thickness and check_horizontal_line(img, lp, rp):
                 l = lp
                 min_slope = s
         if not (l is None):
             res.append((l, rp))
     return res
+
+
+def widths(img):
+    h, w = img.shape
+    re = dists_from_right(img)
+    le = dists_from_left(img)
+    return [w - (re[i] + le[i])  for i in range(len(re))]
+
+def lefter_point(img):
+    h, w = img.shape
+    for j in range(w):
+        for i in range(h-1, -1, -1):
+            if img[i][j]:
+                return i, j
