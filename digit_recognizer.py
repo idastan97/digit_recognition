@@ -2,8 +2,6 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from queue import Queue
-import plotly.plotly as py
-import plotly.graph_objs as go
 
 from image_processing_tools import *
 from digit_recognition_tools import *
@@ -27,7 +25,7 @@ def recognize(img):
     im = thresholding(im, threshold)
     plt.imshow(im, cmap='gray')
     plt.show()
-    plt.imsave('ss.png', im, cmap='gray')
+    
 
     adjs = [
         (-1, 0),
@@ -90,11 +88,13 @@ def recognize(img):
         nums2.append(add_frame(get_subarray(im2, p1, p2)))
         # plt.imshow(nums2[-1], cmap='gray')
         # plt.show()
+        # plt.imsave('ss.png', nums2[-1], cmap='gray')
 
     res = []
     for i in range(len(nums2)):
-        print(i)
+        # print(i)
         res.append(digit_recognize(nums2[i]))
+        print(res[-1])
 
     return res
 
@@ -118,7 +118,7 @@ def digit_recognize(img):
     im = defect_filling(im)
     plt.imshow(im, cmap='gray')
     plt.show()
-    # plt.imsave('ss.png', im, cmap='gray')
+    # plt.imsave('tt.png', im, cmap='gray')
 
     # count the number of holes
     holes = get_holes(im)
@@ -175,6 +175,7 @@ def digit_recognize(img):
         four = draw_line_h(im, vertices[0], vertices[1])
         # plt.imshow(four, cmap='gray')
         # plt.show()
+        # plt.imsave('tt.png', four, cmap='gray')
         # count the number of holes
         fholes = get_holes(four)
         fnum_holes = len(fholes) - 1
@@ -244,6 +245,7 @@ def digit_recognize(img):
     im2 = draw_line_v(im2, lp2, up2, t=2)
     # plt.imshow(im2, cmap='gray')
     # plt.show()
+    # plt.imsave('tt.png', im2, cmap='gray')
     num_holes2 = len(get_holes(im2)) -1
     if num_holes2 == 1:
         return 1

@@ -3,10 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from digit_recognizer import recognize
 
-total_cnt = 4*10
-cnt = 0
+# total_cnt = 4*10
+# cnt = 0
 
-# for j in range(10):    
+# nums = [7]
+
+# for j in nums:    
 #     for i in range(4):
 #         print(j, i)
 #         imm = cv2.imread("samples/"+str(j) + str(i+1) +".jpg")
