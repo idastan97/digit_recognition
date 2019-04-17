@@ -69,18 +69,17 @@ def spatial_filtering(img, mask, op, dtype=int):
     t, l = mask.shape
     t//=2
     l//=2
-    im = np.concatenate( (np.full([h, l], np.nan), im, np.full([h, l], np.nan)), axis=1)
-    im = np.concatenate( (np.full([t, w+2*l], np.nan), im, np.full([t, w+2*l], np.nan)), axis=0)
+    # im = np.concatenate( (np.full([h, l], np.nan), im, np.full([h, l], np.nan)), axis=1)
+    # im = np.concatenate( (np.full([t, w+2*l], np.nan), im, np.full([t, w+2*l], np.nan)), axis=0)
     res = np.zeros((h, w), dtype=dtype)
-    for i in range(h):
-        for j in range(w):
-            x = i+t
-
-            y = j+l
+    for i in range(t, h-t):
+        for j in range(l, w-l):
+            # x = i+t
+            # y = j+l
             if dtype == int:
-                res[i][j] = round(op(im, mask, x, y))
+                res[i][j] = round(op(im, mask, i, j))
             else:
-                res[i][j] = op(im, mask, x, y)
+                res[i][j] = op(im, mask, i, j)
     return res
 
 
@@ -158,17 +157,17 @@ def linear_filtering(img, mask, dtype=float):
     return spatial_filtering(img, mask, linear_filter_at, dtype=dtype)
 
 
-def sobel(img, threshold=128):
+def sobel(img, threshold=90):
     zI_horizontal = linear_filtering(img, np.array([[-1,-2,-1],[0,0,0],[1,2,1]]))
     zI_vertical = linear_filtering(img,  np.array([[-1,0,1],[-2,0,2],[-1,0,1]]))
     h, w = img.shape
-    res = np.zeros((h, w), dtype=float)
-    for i in range(h):
-        for j in range(w):
+    res = np.zeros((h, w), dtype=int)
+    for i in range(1, h-1):
+        for j in range(1, w-1):
 
             p = math.sqrt( zI_vertical[i][j]**2 + zI_horizontal[i][j]**2 )
             if p > threshold:
-                res[i][j] = p
+                res[i][j] = 1
     return res
 
 
@@ -177,8 +176,8 @@ def laplacian(img, threshold=128):
 
     res = linear_filtering(img, mask, dtype=int) 
     h, w = img.shape
-    for i in range(h):
-        for j in range(w):
+    for i in range(1, h-1):
+        for j in range(1, w-1):
             if res[i][j] < 0:
                 res[i][j] = -res[i][j]
             if res[i][j] < threshold:
@@ -295,3 +294,16 @@ def add_frame(img, thick=3):
     im = np.concatenate( (np.zeros([h, l], dtype=int), im, np.zeros([h, l], dtype=int)), axis=1)
     im = np.concatenate( (np.zeros([t, w+2*l], dtype=int), im, np.zeros([t, w+2*l], dtype=int)), axis=0)
     return im
+
+
+def transpose(img):
+    h, w = img.shape
+    res = np.zeros((w, h), dtype=int)
+    for i in range(h):
+        for j in range(w):
+            res[j][i] = img[i][j]
+    return res
+
+def show(img):
+    plt.imshow(img, cmap='gray')
+    plt.show()

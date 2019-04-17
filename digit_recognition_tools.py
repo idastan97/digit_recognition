@@ -332,3 +332,15 @@ def lefter_point(img):
         for i in range(h-1, -1, -1):
             if img[i][j]:
                 return i, j
+
+
+def top_maxs(img):
+    return left_maxs(transpose(img))
+
+
+def any_point(img):
+    h, w = img.shape
+    for j in range(w-1, -1, -1):
+        for i in range(h):
+            if img[i][i]:
+                return i, j
