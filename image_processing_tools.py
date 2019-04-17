@@ -307,3 +307,4 @@ def transpose(img):
 def show(img):
     plt.imshow(img, cmap='gray')
     plt.show()
+
