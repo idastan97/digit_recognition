@@ -63,7 +63,7 @@ def fit(img, mask, x, y):
     return 1
 
 
-def spatial_filtering(img, mask, op, dtype=int):
+def spatial_filtering(img, mask, op, dtype=int, mp=None):
     im = np.copy(img)
     h, w = im.shape
     t, l = mask.shape
@@ -74,17 +74,16 @@ def spatial_filtering(img, mask, op, dtype=int):
     res = np.zeros((h, w), dtype=dtype)
     for i in range(t, h-t):
         for j in range(l, w-l):
-            # x = i+t
-            # y = j+l
-            if dtype == int:
-                res[i][j] = round(op(im, mask, i, j))
-            else:
-                res[i][j] = op(im, mask, i, j)
+            if mp is None or mp[i][j]:
+                if dtype == int:
+                    res[i][j] = round(op(im, mask, i, j))
+                else:
+                    res[i][j] = op(im, mask, i, j)
     return res
 
 
-def dilation(img, mask=np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]])):
-    return spatial_filtering(img, mask, hit)
+def dilation(img, mask=np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]), mp=None):
+    return spatial_filtering(img, mask, hit, mp=mp)
 
 
 def erosion(img, mask=np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]])):
@@ -254,14 +253,6 @@ def histogram(img):
         for j in range(w):
             res[img[i][j]//4] += 1
     return res
-
-
-# def thresh_val(img):
-#     h, w = img.shape
-#     hist = histogram(img)
-#     for i in range(len(hist)-1, -1,  -1):
-#         if hist[i] > 20:
-#             return (i+1)*4
 
 
 def thresh_val(img):

@@ -27,7 +27,8 @@ def recognize(img):
     im = negative(im)
 
     #   applying sobel edge detection
-    im = sobel(im)
+    # im = sobel(im)
+    im = union(sobel(im), dilation(im, mp=thresholding(im, thresh_val(im))))
 
     #   closing procedure to remove roughness and gaps
     im = closing(im)
@@ -103,15 +104,15 @@ def recognize(img):
                     if pxs > max_pxs:
                         max_pxs = pxs
                     pxss.append(pxs)
-                    cords.append(  ( (minx, miny), (maxx, maxy) )  )
+                    # cords.append(  ( (minx, miny), (maxx, maxy) )  )
+                    num = add_frame(get_subarray(num, (minx, miny), (maxx, maxy)), thick=1)
                     nums.append(num)
         # cropping components
         nums2 = []
         for i in range(len(pxss)):
-            if pxss[i] < max_pxs/4:
+            if pxss[i] <= max_pxs/10:
                 continue
-            p1, p2 = cords[i]
-            nums2.append(add_frame(get_subarray(im2, p1, p2), thick=1))
+            nums2.append(nums[i])
         final_nums2.append(nums2)
 
     # running recognition for each component
