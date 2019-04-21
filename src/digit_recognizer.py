@@ -12,8 +12,11 @@ def recognize(img):
     '''Function to recognize digits on a white paper'''
 
     # the original image
-    plt.imshow(img, cmap='gray')
+    print(' - The input image: ')
+    plt.imshow(img)
     plt.show()
+
+    print(' - Preprocessing started (it may take several minutes) ...')
 
     # Preprocessing
     im = np.copy(img)
@@ -33,11 +36,14 @@ def recognize(img):
     #   closing procedure to remove roughness and gaps
     im = closing(im)
 
+    print(' - The result of preprocessing:')
     #   the preprocessed image
     plt.imshow(im, cmap='gray')
     plt.show()
-    plt.imsave('preprocessed.png', im, cmap='gray')
+    # plt.imsave('preprocessed.png', im, cmap='gray')
     
+
+    print(' - Segmentation started ...')
     # extracting connected components (digits)
     adjs = [
         (-1, 0),
@@ -121,15 +127,13 @@ def recognize(img):
         res = []
         for j in range(len(final_nums2[i])):
             res.append(digit_recognize(final_nums2[i][j]))
+            print(' - Result of recognition:')
             print(res[-1])
         final_res.append(res)
-
     return final_res
 
 
 def digit_recognize(img):
-    # cropped image
-    show(img)
 
     # Preprocessing
     thickness = 5
@@ -148,9 +152,12 @@ def digit_recognize(img):
     # filling defects
     im = defect_filling(im)
 
+    print(' - Segmented digit: ')
     # The result of preprocessing
     show(im)
 
+
+    print(' - Recognition started ...')
     # count the number of holes
     holes = get_holes(im)
     num_holes = len(holes) - 1

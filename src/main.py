@@ -4,8 +4,10 @@ import matplotlib.pyplot as plt
 from digit_recognizer import recognize
 
 # write filename here
-imm = cv2.imread("test10.jpg")
+imm = cv2.imread("test1.jpg")
 
 # The results
-print(*recognize(imm), sep='\n')
+res = recognize(imm)
+print(' - The final result:')
+print(*res, sep='\n')
 
